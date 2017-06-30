@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		101679DB1F0601E800427078 /* YoEthanRobot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101679DA1F0601E800427078 /* YoEthanRobot.swift */; };
 		BC1956091D1085DA00ED16A6 /* flat_medal_big.png in Resources */ = {isa = PBXBuildFile; fileRef = BC1956081D1085DA00ED16A6 /* flat_medal_big.png */; };
 		BC19560B1D1086E400ED16A6 /* Confetti.sks in Resources */ = {isa = PBXBuildFile; fileRef = BC19560A1D1086E400ED16A6 /* Confetti.sks */; };
 		BC3D14751D036A03009F8569 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3D14741D036A03009F8569 /* AppDelegate.m */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		101679DA1F0601E800427078 /* YoEthanRobot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoEthanRobot.swift; sourceTree = "<group>"; };
 		BC1956081D1085DA00ED16A6 /* flat_medal_big.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flat_medal_big.png; sourceTree = "<group>"; };
 		BC19560A1D1086E400ED16A6 /* Confetti.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Confetti.sks; sourceTree = "<group>"; };
 		BC3D14701D036A03009F8569 /* RobotWarsOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RobotWarsOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,6 +191,7 @@
 				BC3D14D11D036C0F009F8569 /* TurretRobot.swift */,
 				BC3D14CF1D036C0F009F8569 /* CamperRobot.swift */,
 				BC3D14CD1D036C0F009F8569 /* RobotWarsOSX-Bridging-Header.h */,
+				101679DA1F0601E800427078 /* YoEthanRobot.swift */,
 			);
 			name = Robots;
 			path = Resources;
@@ -285,6 +288,7 @@
 				BC3D14BA1D036B24009F8569 /* Helpers.m in Sources */,
 				BC3D14D51D036C0F009F8569 /* TurretRobot.swift in Sources */,
 				BC3D14D31D036C0F009F8569 /* CamperRobot.swift in Sources */,
+				101679DB1F0601E800427078 /* YoEthanRobot.swift in Sources */,
 				BC3D14B81D036B24009F8569 /* GameOverScene.m in Sources */,
 				BC3D14D81D0378D2009F8569 /* TournamentScene.m in Sources */,
 				BC3D14B71D036B24009F8569 /* Bullet.m in Sources */,
