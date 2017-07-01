@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		101679DB1F0601E800427078 /* YoEthanRobot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101679DA1F0601E800427078 /* YoEthanRobot.swift */; };
+		101679DD1F06ED7C00427078 /* AkaRobot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101679DC1F06ED7C00427078 /* AkaRobot.swift */; };
+		101679DF1F07088600427078 /* YoEthanRobotTwo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101679DE1F07088600427078 /* YoEthanRobotTwo.swift */; };
 		BC1956091D1085DA00ED16A6 /* flat_medal_big.png in Resources */ = {isa = PBXBuildFile; fileRef = BC1956081D1085DA00ED16A6 /* flat_medal_big.png */; };
 		BC19560B1D1086E400ED16A6 /* Confetti.sks in Resources */ = {isa = PBXBuildFile; fileRef = BC19560A1D1086E400ED16A6 /* Confetti.sks */; };
 		BC3D14751D036A03009F8569 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3D14741D036A03009F8569 /* AppDelegate.m */; };
@@ -40,6 +42,8 @@
 
 /* Begin PBXFileReference section */
 		101679DA1F0601E800427078 /* YoEthanRobot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoEthanRobot.swift; sourceTree = "<group>"; };
+		101679DC1F06ED7C00427078 /* AkaRobot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AkaRobot.swift; sourceTree = "<group>"; };
+		101679DE1F07088600427078 /* YoEthanRobotTwo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoEthanRobotTwo.swift; sourceTree = "<group>"; };
 		BC1956081D1085DA00ED16A6 /* flat_medal_big.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flat_medal_big.png; sourceTree = "<group>"; };
 		BC19560A1D1086E400ED16A6 /* Confetti.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Confetti.sks; sourceTree = "<group>"; };
 		BC3D14701D036A03009F8569 /* RobotWarsOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RobotWarsOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -186,12 +190,14 @@
 		BC3D14CC1D036BF2009F8569 /* Robots */ = {
 			isa = PBXGroup;
 			children = (
+				101679DA1F0601E800427078 /* YoEthanRobot.swift */,
+				101679DE1F07088600427078 /* YoEthanRobotTwo.swift */,
 				BCCD0AD51D230236004720FB /* AdvancedRobot.swift */,
 				BCCD0AD61D230236004720FB /* SimpleRobot.swift */,
+				101679DC1F06ED7C00427078 /* AkaRobot.swift */,
 				BC3D14D11D036C0F009F8569 /* TurretRobot.swift */,
 				BC3D14CF1D036C0F009F8569 /* CamperRobot.swift */,
 				BC3D14CD1D036C0F009F8569 /* RobotWarsOSX-Bridging-Header.h */,
-				101679DA1F0601E800427078 /* YoEthanRobot.swift */,
 			);
 			name = Robots;
 			path = Resources;
@@ -291,8 +297,10 @@
 				101679DB1F0601E800427078 /* YoEthanRobot.swift in Sources */,
 				BC3D14B81D036B24009F8569 /* GameOverScene.m in Sources */,
 				BC3D14D81D0378D2009F8569 /* TournamentScene.m in Sources */,
+				101679DD1F06ED7C00427078 /* AkaRobot.swift in Sources */,
 				BC3D14B71D036B24009F8569 /* Bullet.m in Sources */,
 				BCCD0AD81D230236004720FB /* SimpleRobot.swift in Sources */,
+				101679DF1F07088600427078 /* YoEthanRobotTwo.swift in Sources */,
 				BCCD0AD71D230236004720FB /* AdvancedRobot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

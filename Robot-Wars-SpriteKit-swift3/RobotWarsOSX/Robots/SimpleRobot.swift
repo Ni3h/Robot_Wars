@@ -15,7 +15,7 @@ class SimpleRobot: Robot {
             moveAhead(80)
             turnRight(20)
             moveAhead(100)
-            shoot()
+          //  shoot()
             turnLeft(10)
         }
     }
@@ -25,7 +25,7 @@ class SimpleRobot: Robot {
     }
     
     override func gotHit() {
-        shoot()
+     //   shoot()
         turnLeft(45)
         moveAhead(100)
     }

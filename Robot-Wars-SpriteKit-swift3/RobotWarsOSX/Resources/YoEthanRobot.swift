@@ -12,7 +12,7 @@ class YoEthanRobot: Robot {
     
     /* ----------- Defining enums for later use --------- */
     enum RobotState {                    // enum for keeping track of RobotState
-        case firstMovement, startScanShooting, hunterKiller, searchAndDestroy, turnAround
+        case firstMovement, startScanShooting, hunterKiller, searchAndDestroy, gotHit, finiteScan
     }
     
     enum startCorner {
@@ -26,9 +26,12 @@ class YoEthanRobot: Robot {
     }
     
     
+    
     /* Variable definitions */
     var flag = false
     var flagTwo = false
+    var flagThree = false
+    var flagFour = false
     
     /* enum declarations */
     var whichCorner: startCorner = .bottomLeft
@@ -40,11 +43,12 @@ class YoEthanRobot: Robot {
     let gunToleranceAngle = CGFloat(2.0)
     let firingTimeout = CGFloat(5.0)
     var actionIndex = 0
+    var secondConstant = 0
+    
+    var enemyHealth = 20
     
     var gunAngle = 0
     var totalDegreesInitial = 0
-    
-    
     
     override func run() {
         while true {
@@ -58,32 +62,27 @@ class YoEthanRobot: Robot {
                 print("Exterminate!")
             case .searchAndDestroy:
                 performNextSearchingAction()
-            case .turnAround:
-                break
+            case . finiteScan:
+                tightenedScan()
+                print("Tightened Scan")
+            case .gotHit:
+                flagTwo = false
+                flagThree = false
+                currentRobotState = .startScanShooting
+   
             }
         }
     }
     
-    func performNextDefaultAction() {
-        // uses actionIndex with switch in case you want to expand and add in more actions
-        // to your initial state -- first thing robot does before scanning another robot
-        switch actionIndex % 1 {          // should be % of number of possible actions
-        case 0:
-            moveAhead(25)
-            currentRobotState = .searchAndDestroy
-        default:
-            break
-        }
-        actionIndex += 1
-    }
-    
     func performNextFiringAction() {
         if currentTimestamp() - lastKnownPositionTimestamp > firingTimeout {
-            turnToCenter()
             print("if statement is flagging")
             flagTwo = false
-            currentRobotState = .startScanShooting
+            flagThree = false
+            secondConstant = 0
+            currentRobotState = .finiteScan
         } else {
+            print ("blast them")
             let angle = Int(angleBetweenGunHeadingDirectionAndWorldPosition(lastKnownPosition))
             if angle >= 0 {
                 turnGunRight(abs(angle))
@@ -98,52 +97,118 @@ class YoEthanRobot: Robot {
     
     
     override func scannedRobot(_ robot: Robot!, atPosition position: CGPoint) {
-        //        if currentRobotState != .lockOn {
-        //            cancelActiveAction()
-        //        }
-        //
-        //        lastKnownPosition = position
-        //        lastKnownPositionTimestamp = currentTimestamp()
-        //        currentRobotState = .lockOn
+        if currentRobotState != .hunterKiller {
+            cancelActiveAction()
+        }
+        
+        flagTwo = true
+        flagThree = true
+        lastKnownPosition = position
+        lastKnownPositionTimestamp = currentTimestamp()
+        currentRobotState = .hunterKiller
     }
     
     override func gotHit() {
-        if currentRobotState == .hunterKiller {
+        if currentRobotState == .hunterKiller && hitPoints() > enemyHealth {
             return
         }
-        moveAhead(120)
+        resetToTurret()
         
-        currentRobotState = .searchAndDestroy
+        if currentRobotState == .gotHit {
+            flagFour = true
+        } else { flagFour = false}
+        
+        flagTwo = false
+        flagThree = false
+        currentRobotState = .startScanShooting
+        
     }
     
-    override func hitWall(_ hitDirection: RobotWallHitDirection, hitAngle angle: CGFloat) {
-        cancelActiveAction()
+    
+    func resetToTurret(){
+        let bodySize = robotBodySize()
+        let arenaSize = arenaDimensions()
+        let toTheEdge = Int(arenaSize.width/2 - bodySize.width)
+        let toTheTop = Int(arenaSize.height - bodySize.width)
+        currentRobotState = .gotHit
         
-        // save old state
-        let previousState = currentRobotState
-        currentRobotState = .turnAround
-        
-        // always turn directly away from wall
-        if angle >= 0 {
-            turnLeft(Int(abs(angle)))
+        if flagFour == false {
+            switch whichCorner {
+            case .bottomLeft:
+                moveAhead(toTheEdge)
+                turnLeft(90)
+                moveAhead(toTheTop)
+                turnLeft(90)
+                moveAhead(toTheEdge)
+                turnToCenter()
+                whichCorner = .topRight
+                currentRobotState = .startScanShooting
+                
+                
+            case .topLeft:
+                moveAhead(toTheEdge)
+                turnRight(90)
+                moveAhead(toTheTop)
+                turnRight(90)
+                moveAhead(toTheEdge)
+                turnToCenter()
+                whichCorner = .bottomRight
+                currentRobotState = .startScanShooting
+                
+                
+            case .bottomRight:
+                moveAhead(toTheEdge)
+                turnRight(90)
+                moveAhead(toTheTop)
+                turnRight(90)
+                moveAhead(toTheEdge)
+                turnToCenter()
+                whichCorner = .topLeft
+                currentRobotState = .startScanShooting
+                
+                
+            case .topRight:
+                moveAhead(toTheEdge)
+                turnLeft(90)
+                moveAhead(toTheTop)
+                turnLeft(90)
+                moveAhead(toTheEdge)
+                turnToCenter()
+                whichCorner = .bottomLeft
+                currentRobotState = .startScanShooting
+            }
+            
         } else {
-            turnRight(Int(abs(angle)))
+            flagFour = true
         }
         
-        // leave wall
-        moveAhead(20)
-        
-        // reset to old state
-        currentRobotState = previousState
     }
     
     
     override func bulletHitEnemy(at position: CGPoint) {
+        enemyHealth -= 1
+        print("enemyHealth")
+        print(enemyHealth)
+        
+        print("our hit points")
+        
+        print(hitPoints())
+        
         if currentRobotState == .hunterKiller {
             lastKnownPosition = position
             lastKnownPositionTimestamp = currentTimestamp()
             currentRobotState = .hunterKiller
         }
+        
+        if currentRobotState == .finiteScan {
+            flagThree = true
+            cancelActiveAction()
+            print("Hit an enemy in finiteScane")
+            lastKnownPosition = position
+            lastKnownPositionTimestamp = currentTimestamp()
+            currentRobotState = .hunterKiller
+        }
+        
         if currentRobotState == .startScanShooting {
             flagTwo = true
             cancelActiveAction()
@@ -151,25 +216,8 @@ class YoEthanRobot: Robot {
             lastKnownPositionTimestamp = currentTimestamp()
             currentRobotState = .hunterKiller
         }
-        
-        
-        
-        
     }
     
-    func turnToEnemyPosition(_ position: CGPoint) {
-        //        cancelActiveAction()
-        //
-        //        // calculate angle between turret and enemey
-        //        let angleBetweenTurretAndEnemy = angleBetweenGunHeadingDirectionAndWorldPosition(position)
-        //
-        //        // turn if necessary
-        //        if angleBetweenTurretAndEnemy > gunToleranceAngle {
-        //            turnGunRight(Int(abs(angleBetweenTurretAndEnemy)))
-        //        } else if angleBetweenTurretAndEnemy < -gunToleranceAngle {
-        //            turnGunLeft(Int(abs(angleBetweenTurretAndEnemy)))
-        //        }
-    }
     
     /* ---------- Original Functions ---------- */
     func firstMovement() {
@@ -196,6 +244,7 @@ class YoEthanRobot: Robot {
             } else {
                 // top right
                 turnLeft(90)
+                
                 whichCorner = .topRight
             }
         }
@@ -207,18 +256,75 @@ class YoEthanRobot: Robot {
         } else {
             moveBack(Int(arenaSize.height - (currentPosition.y + bodyLength)))
         }
-        //        turnToOtherSide()
+        
         movingAcross()
+        aimAtCenter()
         
         currentRobotState = .startScanShooting
     }
     
+    func movingAcross() {
+        let arenaSize = arenaDimensions()
+        let bodySize = robotBodySize()
+        let initialMovement = Int(arenaSize.width/2 - bodySize.width)
+        
+        switch whichCorner {
+        case .bottomLeft:
+            turnRight(90)
+            moveAhead(initialMovement)
+        case .bottomRight:
+            turnLeft(90)
+            moveAhead(initialMovement)
+        case .topLeft:
+            turnLeft(90)
+            moveAhead(initialMovement)
+        case .topRight:
+            turnRight(90)
+            moveAhead(initialMovement)
+        }
+    }
+    
+    
+    func tightenedScan() {
+        var angleToTurn = 0
+        let angleIncrement = 10
+        var constant = 3
+        //  var secondConstant = 0
+        for _ in 1 ... constant {
+            if secondConstant <= constant {
+                if flagThree == false {
+                    angleToTurn += angleIncrement
+                    turnGunRight(angleToTurn)
+                    shoot()
+                    turnGunLeft(angleToTurn * 2)
+                    shoot()
+                    turnGunRight(angleToTurn)
+                    shoot()
+                    secondConstant += 1
+                    print(secondConstant)
+                } else { break }
+            } else {
+                print("This is actually flagging)")
+                turnToCenter()
+                flag = false
+                currentRobotState = .startScanShooting
+            }
+            
+        }
+    }
+    
+    
+    
     func startScanShooting() {
         let arenaSize = arenaDimensions()
-        var topLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: 0, y: arenaSize.height))
-        var topRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: arenaSize.height))
-        var bottomLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x:0, y: 0))
-        var bottomRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: 0))
+        let topLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: 0, y: arenaSize.height))
+        print("testing top left")
+        print(topLeftAngle)
+        
+        
+        let topRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: arenaSize.height))
+        let bottomLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x:0, y: 0))
+        let bottomRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: 0))
         
         let numberOfShots = 24
         gunAngle = 180/numberOfShots
@@ -228,7 +334,7 @@ class YoEthanRobot: Robot {
             totalDegreesInitial = -190
         }
         print("expected height")
-        print(topRightAngle)
+        print(topLeftAngle)
         
         switch whichCorner{
         case .bottomLeft:
@@ -238,7 +344,7 @@ class YoEthanRobot: Robot {
                 flag = true
             }
             if flag == true {
-                for gunGun in 1 ... numberOfShots {
+                for _ in 1 ... numberOfShots {
                     if flagTwo == false {
                         turnGunLeft(gunAngle)
                         shoot()
@@ -253,7 +359,7 @@ class YoEthanRobot: Robot {
                 flag = true
             }
             if flag == true {
-                for gunGun in 1 ... numberOfShots {
+                for _ in 1 ... numberOfShots {
                     if flagTwo == false {
                         turnGunRight(gunAngle)
                         shoot()
@@ -268,7 +374,7 @@ class YoEthanRobot: Robot {
                 flag = true
             }
             if flag == true{
-                for gunGun in 1 ... numberOfShots {
+                for _ in 1 ... numberOfShots {
                     if flagTwo == false {
                         turnGunRight(gunAngle)
                         shoot()
@@ -278,12 +384,12 @@ class YoEthanRobot: Robot {
             }
         case .topRight:
             if flag == false {
-                turnGunRight(Int(350 - (topLeftAngle * -1)))
+                turnGunRight(Int((topRightAngle + 10)  * -1))
                 shoot()
                 flag = true
             }
             if flag == true {
-                for gunGun in 1 ... numberOfShots {
+                for _ in 1 ... numberOfShots {
                     if flagTwo == false {
                         turnGunLeft(gunAngle)
                         shoot()
@@ -310,47 +416,19 @@ class YoEthanRobot: Robot {
         actionIndex += 1
     }
     
-    func turnToOtherSide() {
-        
+    func aimAtCenter() {
         switch whichCorner{
         case .bottomLeft:
-            turnGunRight(55)
+            turnGunLeft(90)
         case .topLeft:
-            turnGunLeft(55)
+            turnGunRight(90)
         case .bottomRight:
-            turnGunLeft(55)
+            turnGunRight(90)
         case .topRight:
-            turnGunRight(55)
+            turnGunLeft(90)
         }
         
     }
-    
-    func movingAcross() {
-        let arenaSize = arenaDimensions()
-        let bodySize = robotBodySize()
-        let initialMovement = Int(arenaSize.width/2 - bodySize.width)
-        
-        switch whichCorner {
-        case .bottomLeft:
-            turnRight(90)
-            moveAhead(initialMovement)
-        // turnLeft(90)
-        case .bottomRight:
-            turnLeft(90)
-            moveAhead(initialMovement)
-        //  turnRight(90)
-        case .topLeft:
-            turnLeft(90)
-            moveAhead(initialMovement)
-        //  turnRight(90)
-        case .topRight:
-            turnRight(90)
-            moveAhead(initialMovement)
-            //  turnLeft(90)
-            
-        }
-    }
-    
     
     func turnToCenter() {
         let arenaSize = arenaDimensions()
