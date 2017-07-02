@@ -48,11 +48,10 @@ class YoEthanRobot: Robot {
     var enemyHealth = 20
     
     var gunAngle = 0
-    var totalDegreesInitial = 0
     
     override func run() {
         while true {
-            switch currentRobotState {
+        switch currentRobotState {
             case .firstMovement:
                 firstMovement()
             case .startScanShooting:
@@ -66,10 +65,11 @@ class YoEthanRobot: Robot {
                 tightenedScan()
                 print("Tightened Scan")
             case .gotHit:
+                flag = false
                 flagTwo = false
                 flagThree = false
                 currentRobotState = .startScanShooting
-   
+
             }
         }
     }
@@ -112,15 +112,17 @@ class YoEthanRobot: Robot {
         if currentRobotState == .hunterKiller && hitPoints() > enemyHealth {
             return
         }
-        resetToTurret()
         
         if currentRobotState == .gotHit {
-            flagFour = true
-        } else { flagFour = false}
-        
+            return
+        } else {
+            currentRobotState = .gotHit
+        }
         flagTwo = false
         flagThree = false
-        currentRobotState = .startScanShooting
+     //   flagFour = false
+        
+        resetToTurret()
         
     }
     
@@ -130,10 +132,12 @@ class YoEthanRobot: Robot {
         let arenaSize = arenaDimensions()
         let toTheEdge = Int(arenaSize.width/2 - bodySize.width)
         let toTheTop = Int(arenaSize.height - bodySize.width)
-        currentRobotState = .gotHit
         
-        if flagFour == false {
+//        if flagFour == true {
+//            return
+//        }
             switch whichCorner {
+                
             case .bottomLeft:
                 moveAhead(toTheEdge)
                 turnLeft(90)
@@ -142,7 +146,7 @@ class YoEthanRobot: Robot {
                 moveAhead(toTheEdge)
                 turnToCenter()
                 whichCorner = .topRight
-                currentRobotState = .startScanShooting
+                flagFour = true
                 
                 
             case .topLeft:
@@ -153,8 +157,8 @@ class YoEthanRobot: Robot {
                 moveAhead(toTheEdge)
                 turnToCenter()
                 whichCorner = .bottomRight
-                currentRobotState = .startScanShooting
-                
+                flagFour = true
+
                 
             case .bottomRight:
                 moveAhead(toTheEdge)
@@ -164,7 +168,7 @@ class YoEthanRobot: Robot {
                 moveAhead(toTheEdge)
                 turnToCenter()
                 whichCorner = .topLeft
-                currentRobotState = .startScanShooting
+                flagFour = true
                 
                 
             case .topRight:
@@ -175,24 +179,17 @@ class YoEthanRobot: Robot {
                 moveAhead(toTheEdge)
                 turnToCenter()
                 whichCorner = .bottomLeft
-                currentRobotState = .startScanShooting
+                flagFour = true
+
+                
             }
-            
-        } else {
-            flagFour = true
-        }
+   
         
     }
     
     
     override func bulletHitEnemy(at position: CGPoint) {
         enemyHealth -= 1
-        print("enemyHealth")
-        print(enemyHealth)
-        
-        print("our hit points")
-        
-        print(hitPoints())
         
         if currentRobotState == .hunterKiller {
             lastKnownPosition = position
@@ -244,7 +241,6 @@ class YoEthanRobot: Robot {
             } else {
                 // top right
                 turnLeft(90)
-                
                 whichCorner = .topRight
             }
         }
@@ -256,17 +252,19 @@ class YoEthanRobot: Robot {
         } else {
             moveBack(Int(arenaSize.height - (currentPosition.y + bodyLength)))
         }
-        
         movingAcross()
         aimAtCenter()
+        //turnToCenter()
         
         currentRobotState = .startScanShooting
     }
     
+    
+    
     func movingAcross() {
         let arenaSize = arenaDimensions()
-        let bodySize = robotBodySize()
-        let initialMovement = Int(arenaSize.width/2 - bodySize.width)
+        let bodyLength = robotBodySize().width
+        let initialMovement = Int(arenaSize.width/2 - bodyLength)
         
         switch whichCorner {
         case .bottomLeft:
@@ -315,26 +313,24 @@ class YoEthanRobot: Robot {
     
     
     
+    
     func startScanShooting() {
         let arenaSize = arenaDimensions()
+        
         let topLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: 0, y: arenaSize.height))
-        print("testing top left")
-        print(topLeftAngle)
-        
-        
         let topRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: arenaSize.height))
         let bottomLeftAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x:0, y: 0))
         let bottomRightAngle = angleBetweenGunHeadingDirectionAndWorldPosition(CGPoint(x: arenaSize.width, y: 0))
         
         let numberOfShots = 24
         gunAngle = 180/numberOfShots
-        
-        totalDegreesInitial += 10
-        if totalDegreesInitial > 180 {
-            totalDegreesInitial = -190
-        }
-        print("expected height")
+        print("Printing Top Left")
         print(topLeftAngle)
+        
+        print("Printing bottom Left")
+        print(bottomRightAngle)
+
+        
         
         switch whichCorner{
         case .bottomLeft:
@@ -384,7 +380,7 @@ class YoEthanRobot: Robot {
             }
         case .topRight:
             if flag == false {
-                turnGunRight(Int((topRightAngle + 10)  * -1))
+                turnGunRight(Int(350 - (topLeftAngle * -1 )))
                 shoot()
                 flag = true
             }
